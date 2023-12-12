@@ -8,12 +8,13 @@ import AddAssignment from "./AddAssignment";
 
 function ListAssignment(props) {
 
+
     const [assignments, setAssignments] = useState([]);
     const [message, setMessage] = useState('');
     const [editDialogOpen, setEditDialogOpen] = useState(false);
     const [addDialogOpen, setAddDialogOpen] = useState(false);
     const [selectedAssignment, setSelectedAssignment] = useState(null);
-
+    const token = sessionStorage.getItem("jwt");
 
     useEffect(() => {
         // called once after intial render
@@ -22,7 +23,9 @@ function ListAssignment(props) {
 
     const fetchAssignments = () => {
         console.log("fetchAssignments");
-        fetch(`${SERVER_URL}/assignment`)
+        fetch(`${SERVER_URL}/assignment`, {
+            headers: {'Authorization' : token}
+        })
             .then((response) => response.json())
             .then((data) => {
                 console.log("assignment length " + data.length);
@@ -33,7 +36,8 @@ function ListAssignment(props) {
 
     const handleDelete = (assignment, force) => {
         fetch(`${SERVER_URL}/assignment/${assignment.id}?force=${force}`, {
-            method: 'DELETE'
+            method: 'DELETE',
+            headers: {'Authorization' : token}
         })
             .then((response) => {
                 if(response.ok){
@@ -91,14 +95,14 @@ function ListAssignment(props) {
                             <td>
                                 <Link to={`/gradeAssignment/${assignments[idx].id}`}>Grade</Link>
                             </td>
-                            <td><Button variant='outlined' onClick={() => openEditDialog(row)}>Edit</Button></td>
+                            <td><Button variant='outlined'  onClick={() => openEditDialog(row)}>Edit</Button></td>
                             <td><Button variant='outlined' onClick={()=> handleDelete(row, false)}>Delete</Button></td>
                             <td><Button variant='outlined' onClick={()=> handleDelete(row, true)}>Force Delete</Button></td>
                         </tr>
                     ))}
                     </tbody>
                 </table>
-                <Button variant='outlined' onClick={() => openAddDialog()}>Add</Button>
+                <Button variant='outlined' id="ADD" onClick={() => openAddDialog()}>Add</Button>
                 <p>&nbsp;</p>
             </div>
 
